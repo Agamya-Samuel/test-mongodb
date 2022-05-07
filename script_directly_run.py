@@ -214,8 +214,6 @@ def main() -> None:
 
 extractedData = [] # acting as a global list
 finalData = [] # acting as a global list
-collection
-cluster 
 
 
 if __name__ == "__main__":
