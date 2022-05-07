@@ -148,7 +148,10 @@ def extractUseable_DataFromIMDB(imdb_id) -> list:    # recursive function
         global finalData
         metadataJSON = json.loads(extractAll_DataFromIMDB(imdb_id=imdb_id))
         IMDB_Title = metadataJSON["d"][0]["l"]
-        IMDB_Year = metadataJSON["d"][0]["y"]
+        try:
+            IMDB_Year = metadataJSON["d"][0]["y"]
+        except KeyError:
+            IMDB_Year = None
         IMDB_Title = removeYearFromTitle(IMDB_Title=IMDB_Title, IMDB_Year=IMDB_Year)
         try:
             IMDB_Poster_url = metadataJSON["d"][0]["i"]["imageUrl"]
