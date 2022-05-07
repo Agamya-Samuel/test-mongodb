@@ -1,3 +1,4 @@
 pymongo==4.0.2
 requests
 python-dotenv
+pymongo[srv]
