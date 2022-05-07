@@ -24,7 +24,7 @@
         "description": "IMDB_API_URL",
         "value": "",
         "required": false
-      },
+      }
     },
     "buildpacks": [{
       "url": "heroku/python"
