@@ -1,0 +1,1 @@
+python3 script_directly_run.py

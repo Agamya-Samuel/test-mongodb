@@ -1,0 +1,32 @@
+{
+    "name": "MonogoDB-Test",
+    "description": "MonogoDB-Test, scrapes metadata from IMDB api",
+    "logo": "https://i.imgur.com/svLm82w.jpg",
+    "repository": "https://github.com/agamya-samuel/test-mongodb",
+    "website":   "https://github.com/agamya-samuel/test-mongodb",
+    "env": {
+      "MONGODB_URL": {
+        "description": "MONGODB_URL",
+        "value": "",
+        "required": false
+      },
+      "MONGODB_DATABASE_NAME": {
+        "description": "MONGODB_URL",
+        "value": "",
+        "required": false
+      },
+      "MONGODB_COLLECTION_NAME": {
+        "description": "MONGODB_COLLECTION_NAME",
+        "value": "",
+        "required": false
+      },
+      "IMDB_API_URL": {
+        "description": "IMDB_API_URL",
+        "value": "",
+        "required": false
+      },
+    },
+    "buildpacks": [{
+      "url": "heroku/python"
+    }]
+  }
