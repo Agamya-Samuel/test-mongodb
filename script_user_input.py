@@ -11,6 +11,15 @@ load_dotenv()
 
 MONGODB_URL = os.getenv('MONGODB_URL')
 IMDB_API_URL = os.getenv('IMDB_API_URL')
+MONGODB_DATABASE_NAME = os.getenv('MONGODB_DATABASE_NAME')
+MONGODB_COLLECTION_NAME = os.getenv('MONGODB_COLLECTION_NAME')
+
+
+def connectTo_MongoDB() -> None:
+    global collection, cluster
+    cluster = MongoClient(MONGODB_URL)
+    database = cluster[MONGODB_DATABASE_NAME]
+    collection = database[MONGODB_COLLECTION_NAME]
 
 
 def generateIMDB_ID(num:int) -> str:
@@ -37,13 +46,6 @@ def getMetadaFromIMDB_API(imdb_id:str) -> str:
 def findLastEntertedDocument_InDB() -> object:
     doc = collection.find().sort("_id", -1).limit(1)
     return doc
-
-
-def connectTo_MongoDB() -> None:
-    global collection, cluster
-    cluster = MongoClient(MONGODB_URL)
-    database = cluster["streamingsitedb"]
-    collection = database["collection1"]
 
 
 def closeConnectionToDB() -> None:
@@ -188,6 +190,7 @@ def uid_counter(start:int, end:int, extractedData:list) -> None:
 def takeInputFromUser(startLimit:int) -> None:
     global extractedData
     num_of_IDs = int(input("Enter the MaxLimit (Enter 0 to Exit) : "))
+    #num_of_IDs = 200
     if num_of_IDs != 0:
         uid_counter(
                     start=startLimit,
@@ -211,6 +214,8 @@ def main() -> None:
 
 extractedData = [] # acting as a global list
 finalData = [] # acting as a global list
+collection
+cluster 
 
 
 if __name__ == "__main__":
