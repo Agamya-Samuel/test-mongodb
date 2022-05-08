@@ -161,9 +161,11 @@ def removeYearFromTitle(IMDB_Title:str, IMDB_Year:int) -> str:
             if (str(IMDB_Year) in IMDB_Title):
                 if (
                         (IMDB_Title[0] == "(") and
-                        (IMDB_Title[5] == "-") and
-                        (IMDB_Title[10] == ")") and
-                        (len(IMDB_Title) == 11)
+                        (IMDB_Title[-1] == ")") and
+                        (
+                            (len(IMDB_Title) == 11) or
+                            (len(IMDB_Title) == 9)
+                        )
                     ):  # some Title have no name, just year like "tt0511504" whose Title is: (1988-12) 😂
                     pass
                 elif (
