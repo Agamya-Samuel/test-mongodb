@@ -7,12 +7,54 @@ import requests
 import json
 
 
-load_dotenv()
-
-MONGODB_URL = os.getenv('MONGODB_URL')
-IMDB_API_URL = os.getenv('IMDB_API_URL')
-MONGODB_DATABASE_NAME = os.getenv('MONGODB_DATABASE_NAME')
-MONGODB_COLLECTION_NAME = os.getenv('MONGODB_COLLECTION_NAME')
+def getConfigENV() -> None:
+    global MONGODB_URL, MONGODB_DATABASE_NAME, MONGODB_COLLECTION_NAME, IMDB_API_URL
+    try:
+        MONGODB_URL = os.getenv('MONGODB_URL')
+        IMDB_API_URL = os.getenv('IMDB_API_URL')
+        MONGODB_DATABASE_NAME = os.getenv('MONGODB_DATABASE_NAME')
+        MONGODB_COLLECTION_NAME = os.getenv('MONGODB_COLLECTION_NAME')
+        if (
+                (len(MONGODB_URL) != 0) and 
+                (len(IMDB_API_URL) != 0) and 
+                (len(MONGODB_DATABASE_NAME) != 0) and 
+                (len(MONGODB_COLLECTION_NAME) != 0)
+            ):
+            raise TypeError
+        else:
+            print("config vars loaded Successfully.")
+    except TypeError:
+        try:
+            CONFIG_FILE_URL = os.getenv('CONFIG_FILE_URL')
+            config_res = requests.request("GET", CONFIG_FILE_URL)
+            print(f"Fetching config.env from: {CONFIG_FILE_URL}")
+            if config_res.status_code == 200:
+                print("Nice, config.env downloaded Successfully!!")
+                with open('config.env', 'wb+') as f:
+                    f.write(config_res.content)
+                load_dotenv('config.env', override=True)
+                MONGODB_URL = os.getenv('MONGODB_URL')
+                IMDB_API_URL = os.getenv('IMDB_API_URL')
+                MONGODB_DATABASE_NAME = os.getenv('MONGODB_DATABASE_NAME')
+                MONGODB_COLLECTION_NAME = os.getenv('MONGODB_COLLECTION_NAME')
+            else:
+                print(f"Failed to download config.env {config_res.status_code}")
+                raise Exception
+        except Exception as e:
+            print(f"Error: {e}")
+            try:
+                load_dotenv('config.env', override=True)
+                print("Loading config.env from local")
+                MONGODB_URL = os.getenv('MONGODB_URL')
+                IMDB_API_URL = os.getenv('IMDB_API_URL')
+                MONGODB_DATABASE_NAME = os.getenv('MONGODB_DATABASE_NAME')
+                MONGODB_COLLECTION_NAME = os.getenv('MONGODB_COLLECTION_NAME')
+            except:
+                print("config.env not found in local")
+    print(f"{MONGODB_URL = }")
+    print(f"{IMDB_API_URL = }")
+    print(f"{MONGODB_DATABASE_NAME = }")
+    print(f"{MONGODB_COLLECTION_NAME = }")
 
 
 def connectTo_MongoDB() -> None:
@@ -205,6 +247,7 @@ def takeInputFromUser(startLimit:int) -> None:
 
 def main() -> None:
     global extractedData
+    getConfigENV()
     connectTo_MongoDB()
     #clearEntireDB()
     extractedData = extractDataFromLastDocument()
@@ -217,6 +260,8 @@ def main() -> None:
 
 extractedData = [] # acting as a global list
 finalData = [] # acting as a global list
+MONGODB_URL, MONGODB_DATABASE_NAME, MONGODB_COLLECTION_NAME, IMDB_API_URL = ["", "", "", ""]
+
 
 
 if __name__ == "__main__":
