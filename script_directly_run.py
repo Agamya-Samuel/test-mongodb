@@ -57,6 +57,37 @@ def getConfigENV() -> None:
     print(f"{MONGODB_COLLECTION_NAME = }")
 
 
+def checkIPIFY() -> None:
+    try:
+        IPIFY_GEO_API = os.getenv('IPIFY_GEO_API')
+        if (len(IPIFY_GEO_API) == 0):
+            raise TypeError
+        else:
+            fetchIP_Address(IPIFY_GEO_API=IPIFY_GEO_API)
+    except TypeError:
+        pass
+
+
+def fetchIP_Address(IPIFY_GEO_API: str) -> None:
+    ip = requests.request("GET", IPIFY_GEO_API).text
+    ip_json = json.loads(ip)
+    ip_data = f"""
+            IP Address: {ip_json["ip"]}
+
+            Country: {ip_json["location"]["country"]}
+            Region: {ip_json["location"]["region"]}
+            City: {ip_json["location"]["city"]}
+
+            Autonomous System Number: {ip_json["as"]["asn"]}
+            Name: {ip_json["as"]["name"]}
+            Route: {ip_json["as"]["route"]}
+            Domain: {ip_json["as"]["domain"]}
+
+            ISP: {ip_json["isp"]}
+    """
+    print(f"Instance Details are:\n{ip_data}")
+
+
 def connectTo_MongoDB() -> None:
     global collection, cluster
     cluster = MongoClient(MONGODB_URL)
@@ -248,6 +279,7 @@ def takeInputFromUser(startLimit:int) -> None:
 def main() -> None:
     global extractedData
     getConfigENV()
+    checkIPIFY()
     connectTo_MongoDB()
     #clearEntireDB()
     extractedData = extractDataFromLastDocument()
