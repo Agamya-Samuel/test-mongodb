@@ -7,12 +7,85 @@ import requests
 import json
 
 
-load_dotenv()
+def getConfigENV() -> None:
+    global MONGODB_URL, MONGODB_DATABASE_NAME, MONGODB_COLLECTION_NAME, IMDB_API_URL
+    try:
+        MONGODB_URL = os.getenv('MONGODB_URL')
+        IMDB_API_URL = os.getenv('IMDB_API_URL')
+        MONGODB_DATABASE_NAME = os.getenv('MONGODB_DATABASE_NAME')
+        MONGODB_COLLECTION_NAME = os.getenv('MONGODB_COLLECTION_NAME')
+        if (
+                (len(MONGODB_URL) != 0) and 
+                (len(IMDB_API_URL) != 0) and 
+                (len(MONGODB_DATABASE_NAME) != 0) and 
+                (len(MONGODB_COLLECTION_NAME) != 0)
+            ):
+            raise TypeError
+        else:
+            print("config vars loaded Successfully.")
+    except TypeError:
+        try:
+            CONFIG_FILE_URL = os.getenv('CONFIG_FILE_URL')
+            config_res = requests.request("GET", CONFIG_FILE_URL)
+            print(f"Fetching config.env from: {CONFIG_FILE_URL}")
+            if config_res.status_code == 200:
+                print("Nice, config.env downloaded Successfully!!")
+                with open('config.env', 'wb+') as f:
+                    f.write(config_res.content)
+                load_dotenv('config.env', override=True)
+                MONGODB_URL = os.getenv('MONGODB_URL')
+                IMDB_API_URL = os.getenv('IMDB_API_URL')
+                MONGODB_DATABASE_NAME = os.getenv('MONGODB_DATABASE_NAME')
+                MONGODB_COLLECTION_NAME = os.getenv('MONGODB_COLLECTION_NAME')
+            else:
+                print(f"Failed to download config.env {config_res.status_code}")
+                raise Exception
+        except Exception as e:
+            print(f"Error: {e}")
+            try:
+                load_dotenv('config.env', override=True)
+                print("Loading config.env from local")
+                MONGODB_URL = os.getenv('MONGODB_URL')
+                IMDB_API_URL = os.getenv('IMDB_API_URL')
+                MONGODB_DATABASE_NAME = os.getenv('MONGODB_DATABASE_NAME')
+                MONGODB_COLLECTION_NAME = os.getenv('MONGODB_COLLECTION_NAME')
+            except:
+                print("config.env not found in local")
+    print(f"{MONGODB_URL = }")
+    print(f"{IMDB_API_URL = }")
+    print(f"{MONGODB_DATABASE_NAME = }")
+    print(f"{MONGODB_COLLECTION_NAME = }")
 
-MONGODB_URL = os.getenv('MONGODB_URL')
-IMDB_API_URL = os.getenv('IMDB_API_URL')
-MONGODB_DATABASE_NAME = os.getenv('MONGODB_DATABASE_NAME')
-MONGODB_COLLECTION_NAME = os.getenv('MONGODB_COLLECTION_NAME')
+
+def checkIPIFY() -> None:
+    try:
+        IPIFY_GEO_API = os.getenv('IPIFY_GEO_API')
+        if (len(IPIFY_GEO_API) == 0):
+            raise TypeError
+        else:
+            fetchIP_Address(IPIFY_GEO_API=IPIFY_GEO_API)
+    except TypeError:
+        pass
+
+
+def fetchIP_Address(IPIFY_GEO_API: str) -> None:
+    ip = requests.request("GET", IPIFY_GEO_API).text
+    ip_json = json.loads(ip)
+    ip_data = f"""
+            IP Address: {ip_json["ip"]}
+
+            Country: {ip_json["location"]["country"]}
+            Region: {ip_json["location"]["region"]}
+            City: {ip_json["location"]["city"]}
+
+            Autonomous System Number: {ip_json["as"]["asn"]}
+            Name: {ip_json["as"]["name"]}
+            Route: {ip_json["as"]["route"]}
+            Domain: {ip_json["as"]["domain"]}
+
+            ISP: {ip_json["isp"]}
+    """
+    print(f"Instance Details are:\n{ip_data}")
 
 
 def connectTo_MongoDB() -> None:
@@ -87,6 +160,13 @@ def removeYearFromTitle(IMDB_Title:str, IMDB_Year:int) -> str:
     if str(IMDB_Year) != IMDB_Title: # some movies have same Title and Relase Year
             if (str(IMDB_Year) in IMDB_Title):
                 if (
+                        (IMDB_Title[0] == "(") and
+                        (IMDB_Title[5] == "-") and
+                        (IMDB_Title[10] == ")") and
+                        (len(IMDB_Title) == 11)
+                    ):  # some Title have no name, just year like "tt0511504" whose Title is: (1988-12) 😂
+                    pass
+                elif (
                         (
                             (IMDB_Title[-1] == ")") and 
                             (IMDB_Title[-11] == "(") and 
@@ -193,7 +273,7 @@ def uid_counter(start:int, end:int, extractedData:list) -> None:
 def takeInputFromUser(startLimit:int) -> None:
     global extractedData
     num_of_IDs = int(input("Enter the MaxLimit (Enter 0 to Exit) : "))
-    #num_of_IDs = 200
+    #num_of_IDs = 200_000
     if num_of_IDs != 0:
         uid_counter(
                     start=startLimit,
@@ -205,6 +285,8 @@ def takeInputFromUser(startLimit:int) -> None:
 
 def main() -> None:
     global extractedData
+    getConfigENV()
+    checkIPIFY()
     connectTo_MongoDB()
     clearEntireDB()
     extractedData = extractDataFromLastDocument()
@@ -217,6 +299,8 @@ def main() -> None:
 
 extractedData = [] # acting as a global list
 finalData = [] # acting as a global list
+MONGODB_URL, MONGODB_DATABASE_NAME, MONGODB_COLLECTION_NAME, IMDB_API_URL = ["", "", "", ""]
+
 
 
 if __name__ == "__main__":
