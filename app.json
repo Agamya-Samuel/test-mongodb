@@ -7,27 +7,22 @@
     "env": {
       "MONGODB_URL": {
         "description": "MONGODB_URL",
-        "value": "",
         "required": false
       },
       "MONGODB_DATABASE_NAME": {
         "description": "MONGODB_URL",
-        "value": "",
         "required": false
       },
       "MONGODB_COLLECTION_NAME": {
         "description": "MONGODB_COLLECTION_NAME",
-        "value": "",
         "required": false
       },
       "IMDB_API_URL": {
         "description": "IMDB_API_URL",
-        "value": "",
         "required": false
       },
        "CONFIG_FILE_URL": {
         "description": "CONFIG_FILE_URL",
-        "value": "",
         "required": false
       }
     },
