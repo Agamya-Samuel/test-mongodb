@@ -72,18 +72,18 @@ def fetchIP_Address(IPIFY_GEO_API: str) -> None:
     ip = requests.request("GET", IPIFY_GEO_API).text
     ip_json = json.loads(ip)
     ip_data = f"""
-            IP Address: {ip_json["ip"]}
+    IP Address: {ip_json["ip"]}
 
-            Country: {ip_json["location"]["country"]}
-            Region: {ip_json["location"]["region"]}
-            City: {ip_json["location"]["city"]}
+    Country: {ip_json["location"]["country"]}
+    Region: {ip_json["location"]["region"]}
+    City: {ip_json["location"]["city"]}
 
-            Autonomous System Number: {ip_json["as"]["asn"]}
-            Name: {ip_json["as"]["name"]}
-            Route: {ip_json["as"]["route"]}
-            Domain: {ip_json["as"]["domain"]}
+    Autonomous System Number: {ip_json["as"]["asn"]}
+    Name: {ip_json["as"]["name"]}
+    Route: {ip_json["as"]["route"]}
+    Domain: {ip_json["as"]["domain"]}
 
-            ISP: {ip_json["isp"]}
+    ISP: {ip_json["isp"]}
     """
     print(f"Instance Details are:\n{ip_data}")
 
@@ -301,7 +301,7 @@ def main() -> None:
 
 extractedData = [] # acting as a global list
 finalData = [] # acting as a global list
-MONGODB_URL, MONGODB_DATABASE_NAME, MONGODB_COLLECTION_NAME, IMDB_API_URL = ["", "", "", ""]
+MONGODB_URL, MONGODB_DATABASE_NAME, MONGODB_COLLECTION_NAME, IMDB_API_URL = ["", "", "", ""] # global variables
 
 
 
