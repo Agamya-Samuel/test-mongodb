@@ -304,6 +304,5 @@ finalData = [] # acting as a global list
 MONGODB_URL, MONGODB_DATABASE_NAME, MONGODB_COLLECTION_NAME, IMDB_API_URL = ["", "", "", ""] # global variables
 
 
-
 if __name__ == "__main__":
     main()
