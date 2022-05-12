@@ -5,6 +5,7 @@ from pymongo import MongoClient
 
 import requests
 import json
+import re
 
 
 def getConfigENV() -> None:
@@ -156,6 +157,52 @@ def insertIntoTheDB(document: object) -> None:
     collection.insert_one(document)
 
 
+def regexPattern1(inputYear:str) -> list: # (1846-1948)
+    pattern = re.compile("\(\d\d\d\d-\d\d\d\d\)")
+    matches = pattern.finditer(inputYear)
+    for match in matches:
+        if match.start() == 0:
+            print("Found 0 results, in matches for Pattern 1.")
+            return [False, match.start(), match.end()]
+        else:
+            print("Found matches for Pattern 1.")
+            return [True, match.start(), match.end()]
+    print("Exited Pattern 1")
+
+
+def regexPattern2(inputYear:str) -> list: # (1846-19)
+    pattern = re.compile("\(\d\d\d\d-\d\d\)")
+    matches = pattern.finditer(inputYear)
+    for match in matches:
+        if match.start() == 0:
+            print("Found 0 results, in matches for Pattern 2.")
+            return [False, match.start(), match.end()]
+        else:
+            print("Found matches for Pattern 2.")
+            return [True, match.start(), match.end()]
+    print("Exited Pattern 2")
+
+
+def useRegexFunc(inputYear:str) -> bool:
+    regpatrnoutput = regexPattern1(inputYear=inputYear)
+    try:
+        regpatrnoutput[0]
+    except TypeError:
+        regpatrnoutput = regexPattern2(inputYear=inputYear)
+
+    if regpatrnoutput[0]:
+        print("Pattern 1 match found, Here are the Result:-")
+        print(inputYear[regpatrnoutput[1]:regpatrnoutput[2]])
+        return True
+    elif regexPattern2(inputYear=inputYear)[0]:
+        print("Pattern 2 match found, Here are the Result:-")
+        print(inputYear[regpatrnoutput[1]:regpatrnoutput[2]])
+        return True
+    else:
+        print("No Pattern Match Found using Regex.")
+        return False
+    
+
 def removeYearFromTitle(IMDB_Title:str, IMDB_Year:int) -> str:
     if str(IMDB_Year) != IMDB_Title: # some movies have same Title and Relase Year
             if (str(IMDB_Year) in IMDB_Title):
@@ -163,19 +210,15 @@ def removeYearFromTitle(IMDB_Title:str, IMDB_Year:int) -> str:
                         (IMDB_Title[0] == "(") and
                         (IMDB_Title[-1] == ")") and
                         (
-                            (len(IMDB_Title) == 11) or
-                            (len(IMDB_Title) == 9)
+                            (len(IMDB_Title) == 11) or  # (1845-1934)
+                            (len(IMDB_Title) == 9) or   # (1814-19)
+                            (len(IMDB_Title) == 6) or   # (1845)
+                            (len(IMDB_Title) == 4)      # 1845
                         )
-                    ):  # some Title have no name, just year like "tt0511504" whose Title is: (1988-12) 😂
+                    ):  # some Title have no name, just year like "tt0511504" whose Title is: (1988-12) 😂, these are left as it is and aded to DB without any modification.
                     pass
                 elif (
-                        (
-                            (IMDB_Title[-1] == ")") and 
-                            (IMDB_Title[-11] == "(") and 
-                            (IMDB_Title[-5] == "-")
-                        ) 
-                        or 
-                        (IMDB_Title[-6] == "-")
+                        useRegexFunc(inputYear=IMDB_Title)
                     ):
                     pass
                 else:
