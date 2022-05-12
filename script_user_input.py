@@ -157,46 +157,32 @@ def insertIntoTheDB(document: object) -> None:
     collection.insert_one(document)
 
 
-def regexPattern1(inputYear:str) -> list: # (1846-1948)
+def regexPattern1(inputIMDB_Title:str) -> list: # (1846-1948)
     pattern = re.compile("\(\d\d\d\d-\d\d\d\d\)")
-    matches = pattern.finditer(inputYear)
+    matches = pattern.finditer(inputIMDB_Title)
     for match in matches:
-        if match.start() == 0:
-            print("Found 0 results, in matches for Pattern 1.")
-            return [False, match.start(), match.end()]
-        else:
-            print("Found matches for Pattern 1.")
+        if match.start() != 0:
             return [True, match.start(), match.end()]
-    print("Exited Pattern 1")
+    return [False]
 
 
-def regexPattern2(inputYear:str) -> list: # (1846-19)
+def regexPattern2(inputIMDB_Title:str) -> list: # (1846-19)
     pattern = re.compile("\(\d\d\d\d-\d\d\)")
-    matches = pattern.finditer(inputYear)
+    matches = pattern.finditer(inputIMDB_Title)
     for match in matches:
-        if match.start() == 0:
-            print("Found 0 results, in matches for Pattern 2.")
-            return [False, match.start(), match.end()]
-        else:
-            print("Found matches for Pattern 2.")
+        if match.start() != 0:
             return [True, match.start(), match.end()]
-    print("Exited Pattern 2")
+    return [False]
+    
 
-
-def useRegexFunc(inputYear:str) -> bool:
-    regpatrnoutput = regexPattern1(inputYear=inputYear)
-    try:
-        regpatrnoutput[0]
-    except TypeError:
-        regpatrnoutput = regexPattern2(inputYear=inputYear)
-
-    if regpatrnoutput[0]:
+def useRegexFunc(inputIMDB_Title:str):
+    if regexPattern1(inputIMDB_Title=inputIMDB_Title)[0]:
         print("Pattern 1 match found, Here are the Result:-")
-        print(inputYear[regpatrnoutput[1]:regpatrnoutput[2]])
+        print(inputIMDB_Title[regexPattern1(inputIMDB_Title=inputIMDB_Title)[1]:regexPattern1(inputIMDB_Title=inputIMDB_Title)[2]])
         return True
-    elif regexPattern2(inputYear=inputYear)[0]:
+    elif regexPattern2(inputIMDB_Title=inputIMDB_Title)[0]:
         print("Pattern 2 match found, Here are the Result:-")
-        print(inputYear[regpatrnoutput[1]:regpatrnoutput[2]])
+        print(inputIMDB_Title[regexPattern2(inputIMDB_Title=inputIMDB_Title)[1]:regexPattern2(inputIMDB_Title=inputIMDB_Title)[2]])
         return True
     else:
         print("No Pattern Match Found using Regex.")
@@ -218,7 +204,7 @@ def removeYearFromTitle(IMDB_Title:str, IMDB_Year:int) -> str:
                     ):  # some Title have no name, just year like "tt0511504" whose Title is: (1988-12) 😂, these are left as it is and aded to DB without any modification.
                     pass
                 elif (
-                        useRegexFunc(inputYear=IMDB_Title)
+                        useRegexFunc(inputIMDB_Title=IMDB_Title)
                     ):
                     pass
                 else:
